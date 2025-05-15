@@ -1,0 +1,80 @@
+# @package _global_
+
+# default configuration
+defaults:
+    - _self_
+    - manual_selection: manual_selection.yaml
+    - categories: categories_voc.yaml
+    - override hydra/hydra_logging: disabled
+    - override hydra/job_logging: disabled
+
+    # enable color logging
+    # - override hydra/hydra_logging: colorlog
+    # - override hydra/job_logging: colorlog
+
+work_dir: ${hydra:runtime.cwd}
+
+VOC_IMAGES_PATH: "../../CVDatasets/VOC_0712_converted/JPEGImages"
+
+CURRENT_BENCHMARK_ANNOTATIONS: {
+    "voc": "../../CVDatasets/VOC_0712_converted/val_coco_format.json",
+    "coco": "../../CVDatasets/COCO/annotations/instances_val2017_ood_rm_overlap.json",
+    "openimages": "../../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/val_coco_format.json",
+}
+
+OPENIMAGES_PATHS: {
+    "bboxes_ann": "../../CVDatasets/OpenImages/train-annotations-bbox.csv",
+    "cat_ids": "../../CVDatasets/OpenImages/class-descriptions-boxable.csv",
+    "hierarchy": "../../CVDatasets/OpenImages/bbox_labels_600_hierarchy.json",
+    "images_path": "../../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/images",
+}
+
+COCO_PATHS: {
+    "val_images": "../../CVDatasets/COCO/val2017",
+    "train_images": "../../CVDatasets/COCO/train2017",
+    "val_annotations": "../../CVDatasets/COCO/annotations/instances_val2017.json",
+    "train_annotations": "../../CVDatasets/COCO/annotations/instances_train2017.json",
+}
+
+NEW_SPLITS_IMAGES_PATHS: {
+    "openimages": "../../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/far_images",
+    "openimages_near": "../../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/near_images",
+    "coco": "../../CVDatasets/COCO/far_images",
+    "coco_near": "../../CVDatasets/COCO/near_images"
+}
+
+NEW_SPLITS_ANNOTATIONS_PATHS: {
+    "openimages": "../../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/far_oi_wrt_voc.json",
+    "openimages_near": "../../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/near_oi_wrt_voc.json",
+    "coco": "../../CVDatasets/COCO/annotations/far_coco_wrt_voc.json",
+    "coco_near": "../../CVDatasets/COCO/annotations/near_coco_wrt_voc.json"
+}
+
+NEW_SPLITS_CANDIDATES_IMAGES_PATHS: {
+    "openimages": "../../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/candidates/far_images",
+    "openimages_near": "../../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/candidates/near_images",
+    "coco": "../../CVDatasets/COCO/candidates/far_images",
+    "coco_near": "../../CVDatasets/COCO/candidates/near_images"
+}
+
+OOD_DATASETS: ["coco", "openimages"]
+NEW_OOD_DATASETS: ["coco_near", "openimages_near"]
+
+
+GET_OI_CANDIDATES: False
+GET_COCO_CANDIDATES: False
+MAX_CANDIDATES: 500
+VISUALIZE_OI_N_CANDIDATES: 10
+
+seed: 42
+
+hydra:
+    # output paths for hydra logs
+    run:
+        dir: .
+
+    sweep:
+        dir: logs_hydra/multiruns/${now:%Y-%m-%d_%H-%M-%S}
+        subdir: ${hydra.job.num}
+
+

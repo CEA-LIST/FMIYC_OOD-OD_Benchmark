@@ -1,0 +1,31 @@
+VOC_CLASSES: {
+    "coco": [
+        'person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep', 'airplane', 'bicycle', 'boat', 'bus', 'car',
+        'motorcycle', 'train', 'bottle', 'chair', 'dining table', 'potted plant', 'couch', 'tv'
+    ],
+    "openimages": [
+        'Person', 'Human', 'Human beard', 'Man', 'Woman', 'Boy', 'Girl', 'Body part', 'Bird', 'Cat', 'Cow', 'Dog',
+        'Horse', 'Sheep', 'Airplane', 'Bicycle', 'Bicycle wheel', 'Boat', 'Bus', 'Car', 'Taxi', 'Van', 'Limousine',
+        'Motorcycle', 'Train', 'Bottle', 'Chair', 'Dining table', 'Potted plant', 'Couch', 'Television'
+    ]
+}
+
+CATS_TO_REMOVE: {
+    "openimages": [
+      "Salad", "Person", "Plate", "Broccoli", "Human face", "Flowerpot", "Tableware", "Human arm",
+      "Cat", "Woman", "Fork", "Human head", "Houseplant", "Bird", "Boat", "Human hand", "Human hair",
+      "Human nose", "Human ear", "Human mouth", "Human eye", "Human beard", "Baked goods", "Spoon",
+    ],
+    "coco": ["spoon", "fork", "pizza", "sandwich", "cake", "hot dog", "wine glass", "knife"]
+}
+
+CATS_TO_NEAR_OOD: {
+    "openimages": [
+      "Jaguar", "Fox", "Dog", "Leopard", "Zucchini", "Food", "Cheetah", "Clothing", "Sea lion",
+      "Knife", "Tablet computer", "Laptop", "Rhinoceros", "Raccoon", "Harbor seal", "Hedgehog", "Otter"
+    ],
+    "coco": [
+      "laptop", "zebra", "broccoli", "bed", "spoon", "fork", "bench", "carrot", "orange",
+      "bowl", "apple", "cup", "bear", "vase",
+    ]
+}

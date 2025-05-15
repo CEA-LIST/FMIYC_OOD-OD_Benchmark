@@ -1,0 +1,18 @@
+BDD_CLASSES: {
+    "coco": [
+        'person', 'bicycle', 'bus', 'car', 'motorcycle', 'train', 'pedestrian', 'rider', 'truck',
+        'traffic light', 'traffic sign'
+    ],
+    "openimages": [
+        'Person', 'Human', 'Human beard', 'Man', 'Woman', 'Boy', 'Girl', 'Body part', 'Bicycle', 'Bicycle wheel',
+        'Bus', 'Car', 'Taxi', 'Van', 'Limousine', 'Motorcycle', 'Train', 'Land vehicle'
+    ]
+}
+
+CATS_TO_REMOVE: {
+    "openimages": [
+      "Person", "Human face", "Human arm", "Woman", "Human head", "Human hand", "Human hair",
+      "Human nose", "Human ear", "Human mouth", "Human eye", "Human beard",
+    ],
+    "coco": []
+}

@@ -1,1 +1,3 @@
-# FMIYC_OOD-OD_benchmark
+# FMIYC OOD-OD Benchmark
+
+FindMeIfYouCan Out-of-Distribution Object Detection Benchmark Official Repository

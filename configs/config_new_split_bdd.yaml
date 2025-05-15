@@ -1,0 +1,72 @@
+# @package _global_
+
+# default configuration
+defaults:
+    - _self_
+    - manual_selection: manual_selection.yaml
+    - categories: categories_bdd.yaml
+    - override hydra/hydra_logging: disabled
+    - override hydra/job_logging: disabled
+
+    # enable color logging
+    # - override hydra/hydra_logging: colorlog
+    # - override hydra/job_logging: colorlog
+
+work_dir: ${hydra:runtime.cwd}
+
+BDD_IMAGES_PATH: "../../CVDatasets/bdd100k/images/100k/val"
+
+CURRENT_BENCHMARK_ANNOTATIONS: {
+    "bdd": "../../CVDatasets/bdd100k/val_bdd_converted.json",
+    "coco": "../../CVDatasets/COCO/annotations/instances_val2017_ood_wrt_bdd_rm_overlap.json",
+    "openimages": "../../CVDatasets/OpenImages/ood_classes_rm_overlap/COCO-Format/val_coco_format.json",
+}
+
+OPENIMAGES_PATHS: {
+    "bboxes_ann": "../../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/train-annotations-bbox.csv",
+    "cat_ids": "../../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/class-descriptions-boxable.csv",
+    "hierarchy": "../../CVDatasets/OpenImages/bbox_labels_600_hierarchy.json",
+    "images_path": "../../CVDatasets/OpenImages/ood_classes_rm_overlap/images",
+}
+
+COCO_PATHS: {
+    "val_images": "../../CVDatasets/COCO/val2017",
+    "train_images": "../../CVDatasets/COCO/train2017",
+    "val_annotations": "../../CVDatasets/COCO/annotations/instances_val2017.json",
+    "train_annotations": "../../CVDatasets/COCO/annotations/instances_train2017.json",
+}
+
+NEW_SPLITS_IMAGES_PATHS: {
+    "openimages": "../../CVDatasets/OpenImages/ood_classes_rm_overlap/farther_images_wrt_bdd",
+    "coco": "../../CVDatasets/COCO/farther_images_wrt_bdd",
+}
+
+NEW_SPLITS_ANNOTATIONS_PATHS: {
+    "openimages": "../../CVDatasets/OpenImages/ood_classes_rm_overlap/COCO-Format/farther_oi_wrt_bdd.json",
+    "coco": "../../CVDatasets/COCO/annotations/farther_coco_wrt_bdd.json",
+}
+
+#NEW_SPLITS_CANDIDATES_IMAGES_PATHS: {
+#    "openimages": "../../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/candidates/all_new_images",
+#    "coco": "../../CVDatasets/COCO/candidates/all_new_images",
+#}
+
+OOD_DATASETS: ["coco", "openimages"]
+
+GET_OI_CANDIDATES: False
+GET_COCO_CANDIDATES: False
+MAX_CANDIDATES: 500
+VISUALIZE_OI_N_CANDIDATES: 10
+
+seed: 42
+
+hydra:
+    # output paths for hydra logs
+    run:
+        dir: .
+
+    sweep:
+        dir: logs_hydra/multiruns/${now:%Y-%m-%d_%H-%M-%S}
+        subdir: ${hydra.job.num}
+
+
