@@ -1,0 +1,47 @@
+_BASE_: "../Base-Inference.yaml"
+
+PROBABILISTIC_INFERENCE:
+    # One of the following: 'standard_nms', 'mc_dropout_ensembles',
+    # 'anchor_statistics', 'bayes_od', 'ensemble'
+    INFERENCE_MODE: 'standard_nms'
+
+    BOXES:
+        # Enables MC_Dropout if INFERENCE_MODE supports it.
+        # After inference: perform MC dropout after a normal inference pass (default option for TDL project)
+        AFTER_INFERENCE: True
+        ENABLE: True
+        # HOOKED_LAYER is either
+        # 'Backbone', to get the tensor of outputs from backbone
+        # 'RPN_head' for the output of the RPN's objectness logits
+        # 'RPN_intermediate' for the intermediate representation in the RPN
+        HOOKED_LAYERS: ['RPN_inter']
+        ROI_OUTPUT_SIZES: [16]
+        ROI_SAMPLING_RATIO: -1
+        IND_VALID_SAMPLES: 4000  # Subset training set to speed up evaluation
+        IND_TEST_SAMPLES: 2000
+        EXTRACT_DROPBLOCK_ENTROPY: False
+        INCLUDE_TOPK_OBJECTNESS_OBJECTS: 0  # Use RPN's objectness score to try and detect unknown objects
+
+    MC_DROPOUT:
+        DROPBLOCK_PROB: 0.0
+        DROPBLOCK_SIZE: 0
+        N_MCD_STEPS: 1
+
+    OUTPUT_BOX_CLS: False
+    ASH_INFERENCE: False
+    ASH_PERCENTILE: 65
+    REACT_PERCENTILE: 85
+    DICE_PERCENTILE: 85
+
+    # Either 'openimages_ood_val' for openimages OoD or 'coco_ood_val_bdd', or coco_ood_val for InD VOC
+    # new splits for VOC as ID: coco_ood_new, coco_ood_near, openimages_ood_new, openimages_ood_near
+    # new splits for BDD as ID: coco_ood_new_wrt_bdd, openimages_ood_new_wrt_bdd
+    OOD_DATASET: "openimages_ood_val"
+
+MODEL:
+    RPN:
+        # Either "StandardRPNHead" to not use dropblock in the RPN, or "MCDRpnHead" to use dropblock on the RPN
+        HEAD_NAME: "MCDRpnHead"
+
+    ROI_HEADS:
+        SCORE_THRESH_TEST: 0.55

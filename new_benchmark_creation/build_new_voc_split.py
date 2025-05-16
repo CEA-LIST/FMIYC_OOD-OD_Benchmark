@@ -12,7 +12,7 @@ from matplotlib import pyplot as plt
 from tqdm import tqdm
 
 from OI_downloader import download_all_images
-from edit_COCO_json import COCOParser
+from coco_parser import COCOParser
 import csv
 
 

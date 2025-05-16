@@ -6,10 +6,10 @@ from build_new_voc_split import read_csv_file, convert_cat_ids_oi, convert_oi_hi
     filter_open_im_bboxes, add_bboxes_to_annotations, make_barplot_categories, get_images_to_near_and_remove, \
     visualize_removed_or_near_images, split_old_benchmark, remove_and_split_manual_inspection, copy_images, \
     save_annotation_file_coco_format, visualize_annotations
-from edit_COCO_json import COCOParser
+from coco_parser import COCOParser
 
 
-@hydra.main(version_base=None, config_path="configs/New_benchmark", config_name="config_new_split_bdd.yaml")
+@hydra.main(version_base=None, config_path="configs/New_benchmark", config_name="config_farther_split_bdd.yaml")
 def main(cfg: DictConfig) -> None:
     #############################################################################
     # Read current benchmark annotations

@@ -1,0 +1,83 @@
+# @package _global_
+ind_dataset: "bdd"
+# Experiment name for mlflow logging
+mlflow_experiment_name: RCNN_${ind_dataset}_boxes_ood_detection
+
+#ood_datasets: ["coco_new", "coco_near", "oi_new", "oi_near"]
+ood_datasets: ["coco_new", "oi_new"]
+
+# Baselines parameters
+ash_percentile: 90
+react_percentile: 90
+dice_percentile: 90
+gen_gamma: 0.1
+
+# Inference parameters
+batch_size: 1
+verbose_inference: False
+ind_train_samples: 16551  # Subset training set to speed up evaluation
+ind_valid_samples: 2000  # Subset test set to speed up evaluation
+random_seed: 41
+
+# Extraction parameters
+hooked_modules: ['RPN_inter']
+hook_output: True  # Hook input if false
+return_ground_truth_labels: False
+return_raw_predictions: False
+return_variances: False
+roi_output_sizes: [16]
+roi_sampling_ratio: -1
+inference_predict_confidence: 0.39
+n_pca_components: [1, 2, 4, 6, 8, 10, 12, 20, 24, 28, 32, 36, 44, 52, 60, 68]
+#n_pca_components: [1, 2, 4, 6, 8, 10, 12, 20, 24, 28, 32, 36, 44, 52, 60, 68]
+ind_train_boxes_max: 20000  # Max boxes to use during evaluation
+ood_boxes_max: 7000
+k_neighbors: 10  # For LaREK postprocessor
+vim_remove_background_dimension: False
+num_classes: 20  # For LaREMC Postprocessor  # 10 for BDD, 20 for voc
+# For LaREx methods evaluation:
+dropblock_entropy: False
+n_mcd: 1
+drop_prob: 0.0
+drop_size: 0
+using_vos: False
+using_regnet: False
+z_score_thresholds: 1.645
+metric_2007: False
+get_known_classes_metrics: False
+
+# Ground truth annotations
+ind_annotations_path:
+    voc: "../CVDatasets/VOC_0712_converted/val_coco_format.json"
+    bdd: "../CVDatasets/bdd100k/val_bdd_converted.json"
+ood_annotations_paths:
+    voc:
+        oi_all_new: "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/all_new_oi_wrt_voc.json"
+        coco_all_new: "../CVDatasets/COCO/annotations/all_new_coco_wrt_voc.json"
+        oi_new: "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/new_oi_wrt_voc.json"
+        oi_near: "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/near_oi_wrt_voc.json"
+        coco_new: "../CVDatasets/COCO/annotations/new_coco_wrt_voc.json"
+        coco_near: "../CVDatasets/COCO/annotations/near_coco_wrt_voc.json"
+    bdd:
+        oi_new: "../CVDatasets/OpenImages/ood_classes_rm_overlap/COCO-Format/new_oi_wrt_bdd.json"
+        coco_new: "../CVDatasets/COCO/annotations/new_coco_wrt_bdd.json"
+
+
+# Automatically determined parameters (not to be modified)
+work_dir: ${hydra:runtime.cwd}
+log_dir: logs_hydra/runs/${mlflow_experiment_name}/${now:%Y-%m-%d_%H-%M-%S}
+#latent_samples_folder: ./Extracted_latent_samples/boxes/ind_${ind_dataset}/${hooked_module}
+
+defaults:
+  - _self_
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+hydra:
+    # output paths for hydra logs
+    run:
+        dir: .
+
+    sweep:
+        dir: logs_hydra/multiruns/${now:%Y-%m-%d_%H-%M-%S}
+        subdir: ${hydra.job.num}
