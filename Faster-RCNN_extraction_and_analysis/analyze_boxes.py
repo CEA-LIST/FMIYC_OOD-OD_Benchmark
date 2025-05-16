@@ -1,3 +1,7 @@
+"""
+Script for performing analysis of OOD detection metrics and OSOD metrics on previously extracted samples.
+Logs everything to an mlflow server
+"""
 from typing import Dict, List
 import hydra
 import mlflow
@@ -241,7 +245,7 @@ def main(cfg: DictConfig):
                         methods_names=BASELINES_NAMES + best_postp_names,
                         datasets_names=[f"{ood_dataset_name}_new", f"{ood_dataset_name}_near"],
                         metrics_to_plot=OSOD_METRICS_TO_PLOT,
-                        show_plot=False
+                        show_plot=True
                     )
                     mlflow.log_figure(figure=osod_fig, artifact_file=f"osod/{ood_dataset_name}_new_near.png")
                     for metric_name in OSOD_METRICS_TO_PLOT:
@@ -251,7 +255,7 @@ def main(cfg: DictConfig):
                             methods_names=BASELINES_NAMES + best_postp_names,
                             datasets_names=[f"{ood_dataset_name}_new", f"{ood_dataset_name}_near"],
                             metric_to_plot=metric_name,
-                            show_plot=False
+                            show_plot=True
                         )
                         mlflow.log_figure(
                             figure=metric_plot,
@@ -264,7 +268,7 @@ def main(cfg: DictConfig):
                     methods_names=BASELINES_NAMES + best_postp_names,
                     datasets_names=["coco_new", "oi_new"],
                     metrics_to_plot=OSOD_METRICS_TO_PLOT,
-                    show_plot=False
+                    show_plot=True
                 )
                 mlflow.log_figure(figure=osod_fig, artifact_file=f"osod/new_coco_oi_osod.png")
                 for metric_name in OSOD_METRICS_TO_PLOT:
@@ -274,7 +278,7 @@ def main(cfg: DictConfig):
                         methods_names=BASELINES_NAMES + best_postp_names,
                         datasets_names=["coco_new", "oi_new"],
                         metric_to_plot=metric_name,
-                        show_plot=False
+                        show_plot=True
                     )
                     mlflow.log_figure(
                         figure=metric_plot,

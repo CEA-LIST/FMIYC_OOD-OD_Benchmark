@@ -1,12 +1,11 @@
 """
-Script for performing Probabilistic inference using MC Dropout and testing the ood detection
+Script for performing Model outputs extraction for the InD and OoD datasets. Analysis is performed in another script
 """
 import core
 import os
 import sys
 import torch
 from shutil import copyfile
-from torchvision.transforms import ToTensor
 
 from helper_fns import visualize_predictions
 

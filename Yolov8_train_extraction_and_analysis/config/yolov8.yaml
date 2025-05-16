@@ -1,0 +1,23 @@
+project: runs/yolov8s_bdd
+#project: runs/yolov8s_voc
+model: yolov8s.pt
+pretrained: False
+imgsz: 736  # BDD
+#imgsz: 512  # VOC
+epochs: 100
+optimizer: AdamW
+lr0: 0.001
+cos_lr: True
+task: "detect"
+batch: 16
+save: True
+patience: 15
+seed: 0
+resume: False
+copy_paste: 0.4
+mixup: 0.0
+perspective: 0.0
+dropout: 0.0
+degrees: 0
+shear: 0
+flipud: 0.0

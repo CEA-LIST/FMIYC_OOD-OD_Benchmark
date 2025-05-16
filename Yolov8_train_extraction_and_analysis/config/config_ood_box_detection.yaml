@@ -1,0 +1,101 @@
+# @package _global_
+ind_dataset: "bdd"
+# Experiment name for mlflow logging
+mlflow_experiment_name: Yolo_${ind_dataset}_boxes_ood_detection
+
+# Yolo v8 parameters
+task: "detect"
+mode: "predict"
+model: yolov8n_${ind_dataset}
+name: "train"
+
+#imgsize: 736  # BDD
+imgsize: 512  # VOC
+save_inference_results: False
+#ood_datasets: ["coco", "openimages"]
+ood_datasets: ["coco_new", "oi_new", ]
+
+# Inference parameters
+batch_size: 1
+verbose_inference: False
+ind_train_samples: 4000  # Subset training set to speed up evaluation
+ind_valid_samples: 2000  # Subset test set to speed up evaluation
+random_seed: 41
+
+# Baselines parameters
+gen_gamma: 0.1
+
+# Debugging params
+debug_mode: False
+debug_mode_dataset_length: 20
+
+# Extraction parameters
+#n_mcd_samples: 10
+hooked_module: [9]
+#layer_type: "Conv"
+hook_output: True  # Hook input if false
+#reduction_method: "fullmean"
+return_ground_truth_labels: False
+return_raw_predictions: False
+return_variances: False
+#roi_output_sizes: [32, 16, 8]  # Layer 22 input
+roi_output_sizes: [16]  # Layer 9 output
+#roi_output_sizes: [8, 8]  # Layer 21, 20, 19 output, For layers 18, 17,: output 18x32; For layer 16, 15, output 64x36x64
+# For layer 14 output 192x36x64; Layer 13 o 128x36x64; Layer 12 o 128x18x32; Layer 11 o 384x18x32; Layer 10 o 256x18x32
+# Layer 9, 8, 7 o 256x9x16; Layer 6, 5 o 128x18x32; Layer 4,3 o 64x36x64; Layer 2,1 o 32x72x128
+roi_sampling_ratio: -1
+train_predict_confidence: 0.25
+inference_predict_confidence: 0.25
+#dropblock_probs: [0.0, 0.0, 0.0]
+#dropblock_probs: [0.4, 0.4, 0.4]
+#dropblock_sizes: [0, 0, 0]
+#dropblock_sizes: [17, 8, 4]
+save_latent_samples: True
+#save_entropies: True
+n_pca_components: [1, 2, 4, 6, 8, 10, 12, 20, 24, 28, 32, 36, 44, 52, 60, 68, 76, 84]
+ind_train_boxes_max: 20000  # Max boxes to use during evaluation
+ood_boxes_max: 2000
+k_neighbors: 8  # For LaREK postprocessor
+z_score_thresholds: 1.645
+metric_2007: False
+get_known_classes_metrics: False
+
+# Annotations paths
+ind_annotations_path:
+    voc: "../CVDatasets/VOC_0712_converted/val_coco_format.json"
+    bdd: "../CVDatasets/bdd100k/val_bdd_converted.json"
+ood_annotations_paths:
+    voc:
+        oi_all_new: "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/all_new_oi_wrt_voc.json"
+        coco_all_new: "../CVDatasets/COCO/annotations/all_new_coco_wrt_voc.json"
+        oi_new: "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/new_oi_wrt_voc.json"
+        oi_near: "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/near_oi_wrt_voc.json"
+        coco_new: "../CVDatasets/COCO/annotations/new_coco_wrt_voc.json"
+        coco_near: "../CVDatasets/COCO/annotations/near_coco_wrt_voc.json"
+    bdd:
+        oi_new: "../CVDatasets/OpenImages/ood_classes_rm_overlap/COCO-Format/new_oi_wrt_bdd.json"
+        coco_new: "../CVDatasets/COCO/annotations/new_coco_wrt_bdd.json"
+
+
+# Automatically determined parameters (not to be modified)
+work_dir: ${hydra:runtime.cwd}
+log_dir: logs_hydra/runs/${mlflow_experiment_name}/${now:%Y-%m-%d_%H-%M-%S}
+yolo_cfg_file_path: ./runs/${model}/${name}/args.yaml
+model_filepath: ./runs/${model}/${name}/weights/best.pt
+save_inference_directory: ./runs/${model}/${name}/predict
+latent_samples_folder: ./extracted_latent_samples/${mlflow_experiment_name}/${model}/${name}/
+
+defaults:
+  - _self_
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+hydra:
+    # output paths for hydra logs
+    run:
+#        dir: ${log_dir}
+        dir: .
+
+    sweep:
+        dir: logs_hydra/multiruns/${now:%Y-%m-%d_%H-%M-%S}
+        subdir: ${hydra.job.num}
