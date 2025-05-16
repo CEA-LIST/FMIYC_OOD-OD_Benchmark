@@ -66,15 +66,13 @@ ind_annotations_path:
     bdd: "../CVDatasets/bdd100k/val_bdd_converted.json"
 ood_annotations_paths:
     voc:
-        oi_all_new: "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/all_new_oi_wrt_voc.json"
-        coco_all_new: "../CVDatasets/COCO/annotations/all_new_coco_wrt_voc.json"
-        oi_new: "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/new_oi_wrt_voc.json"
+        oi_far: "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/far_oi_wrt_voc.json"
         oi_near: "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/near_oi_wrt_voc.json"
-        coco_new: "../CVDatasets/COCO/annotations/new_coco_wrt_voc.json"
+        coco_far: "../CVDatasets/COCO/annotations/far_coco_wrt_voc.json"
         coco_near: "../CVDatasets/COCO/annotations/near_coco_wrt_voc.json"
     bdd:
-        oi_new: "../CVDatasets/OpenImages/ood_classes_rm_overlap/COCO-Format/new_oi_wrt_bdd.json"
-        coco_new: "../CVDatasets/COCO/annotations/new_coco_wrt_bdd.json"
+        oi_farther: "../CVDatasets/OpenImages/ood_classes_rm_overlap/COCO-Format/farther_oi_wrt_bdd.json"
+        coco_farther: "../CVDatasets/COCO/annotations/farther_coco_wrt_bdd.json"
 
 
 # Automatically determined parameters (not to be modified)

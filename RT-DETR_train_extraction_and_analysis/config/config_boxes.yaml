@@ -1,0 +1,80 @@
+# @package _global_
+
+# model parameters
+model_type: "RTDETR"
+ind_dataset: "voc"
+checkpoint: lightning_logs/${model_type}_2025-02-12_13-37-56_ind_${ind_dataset}/epoch=8-step=18621.ckpt
+#checkpoint: lightning_logs/${model_type}_2025-02-10_14-45-04_ind_${ind_dataset}/epoch=19-step=174640.ckpt
+train_predict_confidence: 0.30
+inference_predict_confidence: 0.30
+# Experiment name for mlflow logging
+mlflow_experiment_name: ${model_type}_boxes_ind_${ind_dataset}
+# Inference parameters
+batch_size: 1
+ind_train_samples: 4000  # Subset training set to speed up evaluation
+ind_valid_samples: 2000
+ind_train_boxes_max: 50000
+ood_boxes_max: 7200
+random_seed: 42
+
+# Baselines parameters
+ash_percentile: 90
+react_percentile: 90
+dice_percentile: 90
+gen_gamma: 0.1
+
+# Debugging params
+debug_mode: False
+debug_mode_dataset_length: 20
+
+# Extraction parameters
+ood_datasets: ["coco_new", "coco_near", "openimages_new", "openimages_near"]
+#ood_datasets: ["openimages_new", "coco_new"]
+hooked_modules: ['e0']
+layer_type: "Conv"
+hook_output: True  # Hook input if false
+reduction_method: "fullmean"
+return_raw_predictions: False
+return_variances: False
+roi_output_sizes: [16]
+roi_sampling_ratio: -1
+n_pca_components: [1, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32, 36, 44, 52, 60, 68, 76, 84, 128]
+k_neighbors: 12  # For LaREK postprocessor
+vim_remove_background_dimension: True
+
+# OSOD evaluation parameters
+z_score_thresholds: 1.645
+metric_2007: False
+get_known_classes_metrics: False
+
+# Ground truth annotations
+ind_annotations_path:
+    voc: "../CVDatasets/VOC_0712_converted/val_coco_format.json"
+    bdd: "../CVDatasets/bdd100k/val_bdd_converted.json"
+ood_annotations_paths:
+    voc:
+        openimages_far: "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/far_oi_wrt_voc_int_id.json"
+        openimages_near: "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/near_oi_wrt_voc_int_id.json"
+        coco_far: "../CVDatasets/COCO/annotations/far_coco_wrt_voc.json"
+        coco_near: "../CVDatasets/COCO/annotations/near_coco_wrt_voc.json"
+    bdd:
+        openimages_farther: "../CVDatasets/OpenImages/ood_classes_rm_overlap/COCO-Format/farther_oi_wrt_bdd_int_id.json"
+        coco_farther: "../CVDatasets/COCO/annotations/farther_coco_wrt_bdd.json"
+
+# Automatically determined parameters (not to be modified)
+work_dir: ${hydra:runtime.cwd}
+log_dir: logs_hydra/runs/${mlflow_experiment_name}/${now:%Y-%m-%d_%H-%M-%S}
+latent_samples_folder: ./extracted_latent_samples/${mlflow_experiment_name}
+
+defaults:
+  - _self_
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+hydra:
+    # output paths for hydra logs
+    run:
+        dir: .
+    sweep:
+        dir: logs_hydra/multiruns/${now:%Y-%m-%d_%H-%M-%S}
+        subdir: ${hydra.job.num}

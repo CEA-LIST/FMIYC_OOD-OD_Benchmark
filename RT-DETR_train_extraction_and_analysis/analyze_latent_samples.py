@@ -1,13 +1,13 @@
-from pathlib import Path
 from typing import Dict, List
 import hydra
 import mlflow
 import numpy as np
 import torch
-from ood_detect_fns.uncertainty_estimation import calculate_all_baselines, get_aggregated_data_dict, \
-    get_baselines_thresholds, associate_precalculated_baselines_with_raw_predictions
-from ood_detect_fns.uncertainty_estimation.evaluation import log_evaluate_larex
 from ood_detect_fns.metrics import subset_boxes
+from ood_detect_fns.rcnn import remove_background_dimension
+from ood_detect_fns.uncertainty_estimation import remove_latent_features, calculate_all_baselines, \
+    get_aggregated_data_dict, get_baselines_thresholds, associate_precalculated_baselines_with_raw_predictions
+from ood_detect_fns.uncertainty_estimation.evaluation import log_evaluate_larex
 from ood_detect_fns.uncertainty_estimation.open_set_evaluation import get_overall_open_set_results, \
     convert_osod_results_to_pandas_df, plot_two_osod_datasets_metrics, plot_two_osod_datasets_per_metric, \
     convert_osod_results_for_mlflow_logging
@@ -19,33 +19,41 @@ import warnings
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-config_file = "config_ood_box_detection.yaml"
-BASELINES_NAMES = ["msp", "energy", "gen"]
+BASELINES_NAMES = ["msp", "vim", "mdist", "knn", "energy", "ash", "dice", "react", "gen", "dice_react", "ddu"]
 POSTPROCESSORS = ["KNN", "MD", "GMM"]
 VISUALIZE_POSTPROCESSOR = "MD"
-OSOD_METRICS_TO_PLOT = ["nOSE", "AP_U", "P_U", "R_U"]
+MLFLOW_LOGGING = True
 GET_OSOD_PLOTS = True
-BASE_OOD_DATASETS = ["coco", "oi"]
+BASE_OOD_DATASETS = ["coco", "openimages"]
+OSOD_METRICS_TO_PLOT = ["nOSE", "AP_U", "P_U", "R_U"]
+VISUALIZE_SCORE = "MD"
+config_file = "config_boxes.yaml"
 
 
 @hydra.main(version_base=None, config_path="config", config_name=config_file)
 def main(cfg: DictConfig):
     print(
-        f"Analyzing from InD {cfg.ind_dataset}, OoD {cfg.ood_datasets}, boxes, "
-        f"{'std_devs ' if cfg.return_variances else ''}"
-        f"hooked {cfg.hooked_module} output {cfg.hook_output} "
-        f"roi_s{''.join(map(str, cfg.roi_output_sizes))} "
-        f"roi_sr{cfg.roi_sampling_ratio} "
-        f"model {cfg.model}/{cfg.name} "
+        f"Analyzing from model {cfg.model_type} InD {cfg.ind_dataset}, OoD {cfg.ood_datasets}, "
+        f"boxes_"
+        f"hooked {cfg.hooked_modules} output {cfg.hook_output} "
+        f"{'roi_s ' + ''.join(map(str, cfg.roi_output_sizes)) + ' '}"
+        f"{'roi_sr ' + str(cfg.roi_sampling_ratio) + ' '}"
+        f"hooked {cfg.hooked_modules} output {cfg.hook_output} "
         f"Train_conf: {cfg.train_predict_confidence} "
         f"Inf_conf: {cfg.inference_predict_confidence} "
     )
-
     #################################################################
     # Load precalculated data
     #################################################################
-    # Extracted latent samples directory
-    ls_samples_dir = Path(cfg.latent_samples_folder).resolve()
+    # Initialize dummy empty fc params
+    fc_params = {"weight": np.empty(0), "bias": np.empty(0)}
+    if any(b in BASELINES_NAMES for b in ["vim", "ash", "react", "dice", "dice_react"]):
+        # Last layer parameters for ViM calculations
+        fc_params_file_name = cfg.checkpoint.split(".ckpt")[0].split("lightning_logs/")[1].replace("/",
+                                                                                                   "_") + "_fc_params.pt"
+        fc_params = torch.load(
+            f=op_join(cfg.latent_samples_folder, fc_params_file_name), map_location="cpu"
+        )
 
     # InD
     ind_data_splits = ["train", "valid"]
@@ -53,13 +61,12 @@ def main(cfg: DictConfig):
     aggregated_ind_data_dict: Dict[str, np.ndarray] = dict()
     non_empty_preds_ind_im_ids: Dict[str, List[str]] = dict()
     # Track images with no objects found from varying the confidence of predictions
-    ind_no_obj: dict[str, np.ndarray] = dict()
+    ind_no_obj: Dict[str, np.ndarray] = dict()
     for split in ind_data_splits:
-        ind_file_name = get_ind_file_name(cfg=cfg, ls_samples_dir=ls_samples_dir.as_posix(), split=split)
-
+        ind_file_name = get_ind_file_name(cfg=cfg, split=split)
         # Load InD latent space activations
         ind_data_dict[f"{split}"] = torch.load(
-            f=op_join(cfg.latent_samples_folder, ind_file_name + "_ls_samples.pt"), map_location=device
+            f=ind_file_name, map_location=device
         )
         aggregated_ind_data_dict, ind_no_obj, non_empty_preds_ind_im_ids = get_aggregated_data_dict(
             data_dict=ind_data_dict,
@@ -69,7 +76,6 @@ def main(cfg: DictConfig):
             non_empty_predictions_ids=non_empty_preds_ind_im_ids
         )
 
-
     # OoD
     ood_data_dict: Dict[str, Dict[str, Dict[str, torch.Tensor]]] = dict()
     aggregated_ood_data_dict: Dict[str, np.ndarray] = dict()
@@ -77,10 +83,10 @@ def main(cfg: DictConfig):
     # Track images with no objects found from varying the confidence of predictions
     ood_no_obj: Dict[str, np.ndarray] = dict()
     for ood_dataset_name in cfg.ood_datasets:
-        ood_file_name = get_ood_file_name(cfg=cfg, ls_samples_dir=ls_samples_dir.as_posix(), ood_dataset_name=ood_dataset_name)
+        ood_file_name = get_ood_file_name(cfg=cfg, ood_dataset_name=ood_dataset_name)
         # Load OoD latent space activations
         ood_data_dict[f"{ood_dataset_name}"] = torch.load(
-            f=op_join(cfg.latent_samples_folder, ood_file_name + "_ls_samples.pt"), map_location=device
+            f=ood_file_name, map_location=device
         )
         aggregated_ood_data_dict, ood_no_obj, non_empty_preds_ood_im_ids = get_aggregated_data_dict(
             data_dict=ood_data_dict,
@@ -89,7 +95,16 @@ def main(cfg: DictConfig):
             no_obj_dict=ood_no_obj,
             non_empty_predictions_ids=non_empty_preds_ood_im_ids
         )
-
+    ###########################################################################
+    # Calculate baselines
+    ###########################################################################
+    if cfg.vim_remove_background_dimension:
+        aggregated_ind_data_dict, aggregated_ood_data_dict, fc_params = remove_background_dimension(
+            fc_params=fc_params,
+            ind_data_dict=aggregated_ind_data_dict,
+            ood_data_dict=aggregated_ood_data_dict,
+            ood_names=cfg.ood_datasets,
+        )
     # Subset boxes since they are a huge number!
     aggregated_ind_data_dict, aggregated_ood_data_dict, non_empty_preds_ind_im_ids, non_empty_preds_ood_im_ids = subset_boxes(
         ind_dict=aggregated_ind_data_dict,
@@ -105,9 +120,14 @@ def main(cfg: DictConfig):
         baselines_names=BASELINES_NAMES,
         ind_data_dict=aggregated_ind_data_dict,
         ood_data_dict=aggregated_ood_data_dict,
-        fc_params=None,
+        fc_params=fc_params,
         cfg=cfg,
         num_classes=10 if cfg.ind_dataset == "bdd" else 20
+    )
+    aggregated_ind_data_dict, aggregated_ood_data_dict = remove_latent_features(
+        id_data=aggregated_ind_data_dict,
+        ood_data=aggregated_ood_data_dict,
+        ood_names=cfg.ood_datasets
     )
     baselines_thresholds = get_baselines_thresholds(
         baselines_names=BASELINES_NAMES,
@@ -134,6 +154,7 @@ def main(cfg: DictConfig):
         non_empty_ids=non_empty_preds_ind_im_ids["valid"],
         is_ood=False
     )
+
     #######################################################################
     # Setup MLFLow
     #######################################################################
@@ -147,6 +168,7 @@ def main(cfg: DictConfig):
         )
     experiment = mlflow.set_experiment(experiment_name=experiment_name)
     mlflow_run_name = get_mlflow_run_name(cfg=cfg)
+
     ##########################################################################
     # Start the evaluation run
     ##########################################################################
@@ -172,6 +194,7 @@ def main(cfg: DictConfig):
                     f"No_obj_{ood_dataset_name}",
                     round((len(no_obj) / ood_datasets_lengths[cfg.ind_dataset][ood_dataset_name]) * 100, 2)
                 )
+
         _, best_postprocessors_dict, postprocessor_thresholds, aggregated_ood_data_dict = log_evaluate_larex(
             cfg=cfg,
             baselines_names=BASELINES_NAMES,
@@ -183,7 +206,7 @@ def main(cfg: DictConfig):
             visualize_score=VISUALIZE_POSTPROCESSOR,
             postprocessors=POSTPROCESSORS,
         )
-        # Associate calculated baselines scores with raw predictions dicts
+
         for ood_dataset_name in cfg.ood_datasets:
             best_postp_names = [best_postprocessors_dict[p_name]["best_comp"] for p_name in POSTPROCESSORS]
             ood_data_dict[ood_dataset_name] = associate_precalculated_baselines_with_raw_predictions(
@@ -194,7 +217,6 @@ def main(cfg: DictConfig):
                 non_empty_ids=non_empty_preds_ood_im_ids[ood_dataset_name],
                 is_ood=True
             )
-        # Get Open set results
         open_set_results = get_overall_open_set_results(
             ind_dataset_name=cfg.ind_dataset,
             ind_gt_annotations_path=cfg.ind_annotations_path[cfg.ind_dataset],
@@ -219,7 +241,7 @@ def main(cfg: DictConfig):
             mlflow.log_table(osod_pd_dfs[ood_dataset_name], f"osod/{ood_dataset_name}_osod_results.csv")
 
         if GET_OSOD_PLOTS:
-            if "coco_near" in cfg.ood_datasets and "oi_near" in cfg.ood_datasets and cfg.ind_dataset == "voc":
+            if "coco_near" in cfg.ood_datasets and "openimages_near" in cfg.ood_datasets and cfg.ind_dataset == "voc":
                 for ood_dataset_name in BASE_OOD_DATASETS:
                     osod_fig = plot_two_osod_datasets_metrics(
                         osod_results_a=osod_pd_dfs[f"{ood_dataset_name}_far"],
@@ -243,22 +265,22 @@ def main(cfg: DictConfig):
                             figure=metric_plot,
                             artifact_file=f"osod/{ood_dataset_name}_far_near_{metric_name}.png"
                         )
-            elif "coco_farther" in cfg.ood_datasets and "oi_farther" in cfg.ood_datasets:
+            elif "coco_farther" in cfg.ood_datasets and "openimages_farther" in cfg.ood_datasets:
                 osod_fig = plot_two_osod_datasets_metrics(
                     osod_results_a=osod_pd_dfs["coco_farther"],
-                    osod_results_b=osod_pd_dfs["oi_farther"],
+                    osod_results_b=osod_pd_dfs["openimages_farther"],
                     methods_names=BASELINES_NAMES + best_postp_names,
-                    datasets_names=["coco_farther", "oi_farther"],
+                    datasets_names=["coco_farther", "openimages_farther"],
                     metrics_to_plot=OSOD_METRICS_TO_PLOT,
                     show_plot=True
                 )
-                mlflow.log_figure(figure=osod_fig, artifact_file=f"osod/farther_coco_oi_osod.png")
+                mlflow.log_figure(figure=osod_fig, artifact_file=f"osod/new_coco_oi_osod.png")
                 for metric_name in OSOD_METRICS_TO_PLOT:
                     metric_plot = plot_two_osod_datasets_per_metric(
                         osod_results_a=osod_pd_dfs["coco_farther"],
-                        osod_results_b=osod_pd_dfs["oi_farther"],
+                        osod_results_b=osod_pd_dfs["openimages_farther"],
                         methods_names=BASELINES_NAMES + best_postp_names,
-                        datasets_names=["coco_farther", "oi_farther"],
+                        datasets_names=["coco_farther", "openimages_farther"],
                         metric_to_plot=metric_name,
                         show_plot=True
                     )
@@ -273,48 +295,48 @@ def main(cfg: DictConfig):
         )
         # Log Open set metrics
         mlflow.log_metrics(open_set_results_mlflow, step=0)
-
         mlflow.end_run()
 
 
-def get_ind_file_name(cfg: DictConfig, ls_samples_dir: str, split: str) -> str:
+def get_ind_file_name(cfg: DictConfig, split: str) -> str:
     ind_file_name = (
-        f"{ls_samples_dir}/ind_{cfg.ind_dataset}_{split}_boxes_"
+        f"{cfg.latent_samples_folder}/ind_{cfg.ind_dataset}_{split}_"
+        f"boxes_"
         f"{'stds_' if cfg.return_variances else ''}"
-        f"hooked{'_'.join(map(str, cfg.hooked_module))}_"
+        f"hooked{'_'.join(cfg.hooked_modules)}_"
         f"output{cfg.hook_output}_"
-        f"roi_s{''.join(map(str, cfg.roi_output_sizes))}_"
-        f"roi_sr{cfg.roi_sampling_ratio}"
-        f"{'_trc_' + str(int(cfg.train_predict_confidence * 100)) if split == 'train' else ''}"
-        f"{'_infc_' + str(int(cfg.inference_predict_confidence * 100)) if split == 'valid' else ''}"
+        f"{'roi_s' + ''.join(map(str, cfg.roi_output_sizes)) + '_'}"
+        f"{'roi_sr' + str(cfg.roi_sampling_ratio) + '_'}"
+        f"{'trc_' + str(int(cfg.train_predict_confidence * 100)) if split == 'train' else ''}"
+        f"{'infc_' + str(int(cfg.inference_predict_confidence * 100)) if split == 'valid' else ''}"
+        f"_ls_samples.pt"
     )
     return ind_file_name
 
 
-def get_ood_file_name(cfg: DictConfig, ls_samples_dir: str, ood_dataset_name: str) -> str:
+def get_ood_file_name(cfg:DictConfig, ood_dataset_name:str) -> str:
     ood_file_name = (
-        f"{ls_samples_dir}/ood_{ood_dataset_name}_boxes_"
+        f"{cfg.latent_samples_folder}/ood_{ood_dataset_name}_"
+        f"boxes_"
         f"{'stds_' if cfg.return_variances else ''}"
-        f"hooked{'_'.join(map(str, cfg.hooked_module))}_"
+        f"hooked{'_'.join(cfg.hooked_modules)}_"
         f"output{cfg.hook_output}_"
-        f"roi_s{''.join(map(str, cfg.roi_output_sizes))}_"
-        f"roi_sr{cfg.roi_sampling_ratio}"
-        f"{'_infc_' + str(int(cfg.inference_predict_confidence * 100))}"
+        f"{'roi_s' + ''.join(map(str, cfg.roi_output_sizes)) + '_'}"
+        f"{'roi_sr' + str(cfg.roi_sampling_ratio) + '_'}"
+        f"{'infc_' + str(int(cfg.inference_predict_confidence * 100))}"
+        f"_ls_samples.pt"
     )
     return ood_file_name
 
 
-def get_mlflow_run_name(cfg):
+def get_mlflow_run_name(cfg: DictConfig) -> str:
     mlflow_run_name = (
-        f"{cfg.model.lstrip('yolov8').rstrip(cfg.ind_dataset)[0]}_t{cfg.name.lstrip('train')}_"
-        f"h{'_'.join(map(str, cfg.hooked_module))}_"
+        f"h{'_'.join(cfg.hooked_modules)}_"
         f"{'stds_' if cfg.return_variances else ''}"
-        f"out{cfg.hook_output}_"
-        f"roi_s{''.join(map(str, cfg.roi_output_sizes))}_"
-        f"roi_sr{cfg.roi_sampling_ratio}"
-        f"{'_trc_' + str(int(cfg.train_predict_confidence * 100))}"
-        f"{'_infc_' + str(int(cfg.inference_predict_confidence * 100))}"
-        f"{'_new_bm' if 'oi_new' in cfg.ood_datasets else ''}"
+        f"{'roi_s' + ''.join(map(str, cfg.roi_output_sizes)) + '_'}"
+        f"infc_{str(int(cfg.inference_predict_confidence * 100))}_"
+        f"kn_{cfg.k_neighbors}"
+        f"{'_new_bm' if 'openimages_new' in cfg.ood_datasets else ''}"
     )
     return mlflow_run_name
 
@@ -323,10 +345,12 @@ ind_datasets_lengths = {
     "bdd": {
         "train": 69853,
         "valid": 10000,
+        "test": 2000  # For boxes evaluation
     },
     "voc": {
         "train": 16551,
         "valid": 4952,
+        "test": 2030
     }
 }
 
@@ -346,6 +370,7 @@ ood_datasets_lengths = {
         "openimages_near": 908,
     }
 }
+
 
 
 if __name__ == "__main__":

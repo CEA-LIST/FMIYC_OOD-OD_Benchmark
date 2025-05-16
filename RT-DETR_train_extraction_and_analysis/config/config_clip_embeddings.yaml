@@ -1,0 +1,79 @@
+# @package _global_
+
+# model parameters
+model_type: "CLIP"
+ind_dataset: "bdd"
+# Experiment name for mlflow logging
+mlflow_experiment_name: ${model_type}_embedding_similarity
+# Inference parameters
+batch_size: 1
+ind_train_samples: 4000  # Subset training set to speed up evaluation
+ind_valid_samples: 2000
+ind_train_boxes_max: 50000
+random_seed: 42
+
+# Baselines parameters
+#ash_percentile: 90
+#react_percentile: 90
+#dice_percentile: 90
+#gen_gamma: 0.1
+
+# Debugging params
+debug_mode: False
+debug_mode_dataset_length: 20
+
+# Extraction parameters
+#ood_datasets: ["coco_new", "coco_near", "openimages_new", "openimages_near"]
+ood_datasets:
+#    voc: ["coco_new", "coco_near", "openimages_new", "openimages_near"]
+#    bdd: ["coco_new", "openimages_new"]
+    voc: ["coco", "openimages"]
+    bdd: ["coco", "openimages"]
+
+normalize: True
+#hooked_modules: ['e0']
+#layer_type: "Conv"
+#hook_output: True  # Hook input if false
+#reduction_method: "fullmean"
+#return_raw_predictions: False
+#return_variances: False
+#roi_output_sizes: [16]
+#roi_sampling_ratio: -1
+#n_pca_components: [1, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32, 36, 44, 52, 60, 68, 76, 84, 128]
+#k_neighbors: 12  # For LaREK postprocessor
+#vim_remove_background_dimension: False
+
+# Automatically determined parameters (not to be modified)
+work_dir: ${hydra:runtime.cwd}
+log_dir: logs_hydra/runs/${mlflow_experiment_name}/${now:%Y-%m-%d_%H-%M-%S}
+latent_samples_folder: ./extracted_latent_samples/${mlflow_experiment_name}
+
+#NEW_SPLITS_IMAGES_PATHS:
+#    voc:
+#        openimages_new: "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/new_images"
+#        openimages_near: "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/near_images"
+#        coco_new: "../CVDatasets/COCO/new_images"
+#        coco_near: "../CVDatasets/COCO/near_images"
+#    bdd:
+#
+#
+#
+#NEW_SPLITS_ANNOTATIONS_PATHS: {
+#    "openimages_new": "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/new_oi_wrt_voc.json",
+#    "openimages_near": "../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/COCO-Format/near_oi_wrt_voc.json",
+#    "coco_new": "../CVDatasets/COCO/annotations/new_coco_wrt_voc.json",
+#    "coco_near": "../CVDatasets/COCO/annotations/near_coco_wrt_voc.json"
+#}
+
+defaults:
+  - _self_
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+hydra:
+    # output paths for hydra logs
+    run:
+        dir: .
+    sweep:
+        dir: logs_hydra/multiruns/${now:%Y-%m-%d_%H-%M-%S}
+        subdir: ${hydra.job.num}

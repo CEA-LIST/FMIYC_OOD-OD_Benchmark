@@ -1,0 +1,20 @@
+# @package _global_
+
+model_type: "RTDETR"
+learning_rate: 1e-4
+learning_rate_backbone: 1e-5
+train_batch_size: 8
+random_seed: 40
+model_name: "PekingU/rtdetr_r50vd"  # facebook/detr-resnet-50 for DETR; SenseTime/deformable-detr; PekingU/rtdetr_r50vd
+max_epochs: 120
+num_queries: 100
+inference_threshold: 0.25  # Usually 0.39 for bdd and 0.55 for voc (Faster RCNN Resnet backbone)
+
+hydra:
+    # output paths for hydra logs
+    run:
+        dir: .
+
+    sweep:
+        dir: logs_hydra/multiruns/${now:%Y-%m-%d_%H-%M-%S}
+        subdir: ${hydra.job.num}
