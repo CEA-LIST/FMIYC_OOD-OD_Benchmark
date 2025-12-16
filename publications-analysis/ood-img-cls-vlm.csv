@@ -1,0 +1,35 @@
+Year,Method,Name,Venue,Citation
+2021,Zero Outlier Exposure,ZeroOE,NeurIPS,\cite{fort2021exploring}
+2022,Zero-shot OOD Detection based on CLIP,ZOC,AAAI,\cite{esmaeilpour2022zero}
+2022,Maximum Concept Matching,MCM,NeurIPS,\cite{ming2022delving}
+2023,CLIPN,CLIPN,ICCV,\cite{wang2023clipn}
+2023,PEFT-MCM (Few-shot OOD),PEFT-MCM,IJCV,\cite{ming2024does}
+2023,Local Prompt Learning,LoCoOp,NeurIPS,\cite{miyai2023locoop}
+2024,Negative Label Guided OOD,NegLabel,ICLR,\cite{jiang2024negative}
+2024,Logit Scaling with Negative Prompts,LSN,ICLR,\cite{nie2024out}
+2024,ID-like-Prompt,ID-like-Prompt,CVPR,\cite{bai2024id}
+2024,Negative Prompt Tuning,NegPrompt,CVPR,\cite{li2024learning}
+2024,Envisioning Outlier Exposure,EOE,ICML,\cite{cao2024envisioning}
+2024,Label-driven Automated Prompt Tuning,LAPT,ECCV,\cite{zhang2025lapt}
+2024,Text Prompt Augmentation,TAG,ECCV,\cite{liu2024tag}
+2024,Dual-Pattern Matching,DPM,ECCV,\cite{zhang2024vision}
+2024,Global and Local Prompts,GalLoP,ECCV,\cite{lafon2024gallop}
+2024,Selective Low-Rank Approximation,SeTAR,NeurIPS,\cite{li2024setar}
+2024,Self-Calibrated Tuning,SCT,NeurIPS,\cite{yu2024self}
+2024,Conjugated Semantic Pool,CSP,NeurIPS,\cite{chen2024conjugated}
+2024,Confidence via Corrupted Inputs,CoVer,NeurIPS,\cite{zhang2024if}
+2024,Adaptive Negative Proxy,AdaNeg,NeurIPS,\cite{zhang2024adaneg}
+2024,Self-Calibrated Tuning of Vision-Language Models for OOD,SCT,NeurIPS,\cite{yu2024self}
+2025,Global and Local MCM,GL-MCM,IJCV,\cite{miyai2025gl}
+2025,Local-Prompt,Local-Prompt,ICLR,\cite{zeng2025local}
+2025,Role of Intermediate Representations in OOD,LatOOD,NeurIPS,\cite{rodriguez2025mysteries}
+2025,Point-wise mutual information,PMI,NeurIPS,\cite{peng2025information}
+2025,Text-Image Consistency,DualCnst,NeurIPS,\cite{le2025dualcnst}
+2025,Adaptive Prompt Learning via Gaussian Outlier Synthesis for OOD,APLGOS,ICCV,\cite{zhang2025adaptive}
+2025,Auxiliary Prompt Tuning of Vision-Language Models for Few shot OOD,APT,ICCV,\cite{miao2025auxiliary}
+2025,Forced Prompt Learning of Vision-Language Models for OOD,FA,ICCV,\cite{lu2025fa}
+2025,Equipping Vision Foundation Model with Mixture of Experts for OOD,MoFE,ICCV,\cite{zhao2025equipping}
+2025,Synthesizing Near-Boundary OOD Samples for OOD,SynOOD,ICCV,\cite{li2025synthesizing}
+2025,Adaptive Multi-prompt Contrastive Network,AMCN,ICML,\cite{fang2025adaptive}
+2025,Enhanced OoD Detection through Cross-Modal Alignment of Multi-Modal Representations,MMFT,CVPR,\cite{kim2025enhanced}
+2025,Extensible local prompts for few-shot out-of-distribution detection,Local-prompt,ICLR,\cite{zeng2025local}

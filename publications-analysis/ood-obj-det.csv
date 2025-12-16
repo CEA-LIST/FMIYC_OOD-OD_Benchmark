@@ -1,0 +1,6 @@
+Year,Method,Name,Venue,Citation
+2022,Virtual Outlier Synthesis,VOS,ICLR,\cite{duvos}
+2022,Shaping Representations for detecting OOD objects,SIREN,NeurIPS,\cite{du2022siren}
+2022,Spatial-Temporal Unknown Distillation,STUD,CVPR,\cite{du2022unknown}
+2023,Sensitivity Aware Features for OOD Object Detection,SAFE,ICCV,\cite{wilson2023safe}
+2025,Regional Uncertainty Alignment Object-level OOD,RUNA,AAAI,\cite{zhang2025runa}

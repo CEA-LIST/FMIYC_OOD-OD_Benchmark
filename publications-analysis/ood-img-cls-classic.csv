@@ -1,0 +1,43 @@
+Year,Method,Name,Venue,Citation
+2017,Maximum Softmax Probability,MSP,ICLR,\cite{hendrycks2017baseline}
+2018,Out-of-Distribution Detector for Neural Networks,ODIN,ICLR,\cite{liang2018enhancing} 
+2018,Detection with Mahalanobis Distance,Mahalanobis,NeurIPS,\cite{lee2018simple}
+2018,Outlier Exposure,OE,ICLR,\cite{hendrycks2018oe}
+2019,Why ReLU Networks Yield High Confidence,Why-ReLU,CVPR,\cite{hein2019relu}
+2019,AugMix,AugMix,ICLR,\cite{hendrycks2019augmix}
+2020,Energy-Based OOD Detection,Energy,NeurIPS,\cite{liu2020energy}
+2020,Gram Matrix,Gram,ICML,\cite{sastry2020detecting}
+2020,Generalized ODIN,G-ODIN,CVPR,\cite{hsu2020generalized}
+2020,Contrasting Shifted Instances,CSI,NeurIPS,\cite{tack2020csi}
+2021,Rectified Activations,ReAct,NeurIPS,\cite{sun2021react}
+2021,Gradient Norm,GradNorm,NeurIPS,\cite{huang2021importance}
+2021,Semantically Coherent OOD Detection,SCOOD,ICCV,\cite{yang2021semantically}
+2022,Deep Nearest Neighbors,KNN,ICML,\cite{sun2022out}
+2022,Virtual-Logit Matching,ViM,CVPR,\cite{wang2022vim}
+2022,Logit Normalization,LogitNorm,ICML,\cite{wei2022mitigating}
+2022,DICE,DICE,ECCV,\cite{sun2022dice}
+2023,Extremely Simple Activation Shaping,ASH,ICLR,\cite{djurisic2023extremely}
+2023,Out-of-Distribution Detection via Hopfield Energy,SHE,ICLR,\cite{zhang2022out}
+2023,Generalized Entropy,GEN,CVPR,\cite{liu2023gen}
+2023,Hyperspherical Embeddings,CIDER,ICLR,\cite{ming2023exploit}
+2024,Energy-based Hopfield Boosting for OOD,HB,NeurIPS,\cite{hofmann2024energy}
+2024,Kernel PCA for Out-of-Distribution Detection,KPCA,NeurIPS,\cite{fang2024kernel}
+2024,Diffusion-based Layer-wise Semantic Reconstruction for Unsupervised OOD,DLSR,NeurIPS,\cite{yang2024diffusion}
+2024,Learning to Shape In-distribution Feature Space for OOD,DRL,NeurIPS,\cite{zhang2024learning}
+2024,Out-of-Distribution Detection with a Single Unconditional Diffusion Model,DiffPath,NeurIPS,\cite{heng2024out}
+2025,Revisiting Logit Distributions for Reliable Out-of-Distribution Detection,LogitGap,NeurIPS,\cite{liang2025revisiting}
+2025,Spurious-Aware Prototype Refinement,SPROD,NeurIPS,\cite{zohrabi2025spurious}
+2025,Guided OOD Sampling with Diffusion Models,GOOD,NeurIPS,\cite{gao2025good}
+2025,Free Energy Vulnerability Elimination for Robust OOD,FEVER-OOD,ICCV,\cite{isaac2025fever}
+2025,Gradient Short-Circuit: Efficient OOD via Feature Intervention,GSC,ICCV,\cite{gu2025gradient}
+2025,Taming Adversarially-driven Batch Statistics for Improved OOD,DisCoPatch,ICCV,\cite{caetano2025discopatch}
+2025,Activation Subspaces for Out-of-Distribution Detection,ActSub,ICCV,\cite{zongur2025activation}
+2025,Improving Out-of-Distribution Detection with Markov Logic Networks,MLN,ICML,\cite{kirchheim2025improving}
+2025,Improving Out-of-Distribution Detection via Dynamic Covariance Calibration,OODDCC,ICML,\cite{guo2025improving}
+2025,A Variational Information Theoretic Approach to OOD,VITOOD,ICML,\cite{mondal2025variational}
+2025,Boundary-based Out-Of-Distribution Data Generation,BOOD,ICML,\cite{liao2025bood}
+2025,Mahalanobis++: Improving OOD Detection via Feature Normalization,Mahalanobis++,ICML,\cite{muller2025mahalanobis++}
+2025,Detecting Out-of-distribution through the Lens of Neural Collapse,NCI,CVPR,\cite{liu2025detecting}
+2025,Dual Energy-Based Model with Open-World Uncertainty Estimation for OOD,DEBO,CVPR,\cite{chen2025dual}
+2025,Leveraging Perturbation Robustness to Enhance OOD,PRO,CVPR,\cite{chen2025leveraging}
+2025,Robust OOD Detection via Class-Aware Decoupled Relative Feature Leveraging,CADRef,CVPR,\cite{ling2025cadref}

@@ -1,0 +1,9 @@
+Year,Method,Name,Venue,Citation
+2020,The overlooked elephant of object detection,OpenSet,WACV,\cite{dhamija2020overlooked}
+2021,Open World Object Detection,ORE,CVPR,\cite{joseph2021towards}
+2022,Expanding Low-Density Latent Regions,OpenDet,CVPR,\cite{han2022expanding}
+2022,Open-World Detection Transformer,OW-DETR,CVPR,\cite{gupta2022ow}
+2022,Class-agnostic object detection with multi-modal transformer,MAVL,ECCV,\cite{maaz2022class}
+2023,Random boxes are open-world object detectors,RandBox,ICCV,\cite{wang2023random}
+2023,Unknown sniffer,UnSniffer,CVPR,\cite{liang2023unknown}
+2024,OWDETR++,OWDETR++,ECCV,\cite{ammar2024open}
