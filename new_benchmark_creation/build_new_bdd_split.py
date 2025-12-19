@@ -9,7 +9,7 @@ from build_new_voc_split import read_csv_file, convert_cat_ids_oi, convert_oi_hi
 from coco_parser import COCOParser
 
 
-@hydra.main(version_base=None, config_path="configs/New_benchmark", config_name="config_farther_split_bdd.yaml")
+@hydra.main(version_base=None, config_path="configs", config_name="config_farther_split_bdd.yaml")
 def main(cfg: DictConfig) -> None:
     #############################################################################
     # Read current benchmark annotations

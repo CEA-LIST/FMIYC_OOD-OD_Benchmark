@@ -23,8 +23,8 @@ CURRENT_BENCHMARK_ANNOTATIONS: {
 }
 
 OPENIMAGES_PATHS: {
-    "bboxes_ann": "../../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/train-annotations-bbox.csv",
-    "cat_ids": "../../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/class-descriptions-boxable.csv",
+    "bboxes_ann": "../../CVDatasets/OpenImages/train-annotations-bbox.csv",
+    "cat_ids": "../../CVDatasets/OpenImages/class-descriptions-boxable.csv",
     "hierarchy": "../../CVDatasets/OpenImages/bbox_labels_600_hierarchy.json",
     "images_path": "../../CVDatasets/OpenImages/ood_classes_rm_overlap/images",
 }
@@ -46,6 +46,7 @@ NEW_SPLITS_ANNOTATIONS_PATHS: {
     "coco": "../../CVDatasets/COCO/annotations/farther_coco_wrt_bdd.json",
 }
 
+openimages_bboxes: "../../CVDatasets/OpenImages/ood_classes_rm_overlap/COCO-Format/val_coco_format_bboxes.json"
 #NEW_SPLITS_CANDIDATES_IMAGES_PATHS: {
 #    "openimages": "../../CVDatasets/OpenImages/id_voc_ood_openimages/ood_classes_rm_overlap/candidates/all_new_images",
 #    "coco": "../../CVDatasets/COCO/candidates/all_new_images",
