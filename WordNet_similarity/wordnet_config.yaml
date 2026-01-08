@@ -1,0 +1,33 @@
+# @package _global_
+
+top_k_categories: 20
+ind_annotations_path:
+    voc: "../../CVDatasets/VOC_0712_converted/val_coco_format.json"
+    bdd: "../../CVDatasets/bdd100k/val_bdd_converted.json"
+ood_annotations_paths:
+    voc:
+        openimages_far: "../../CVDatasets/FMIYC/OpenImages/COCO-Format/far_oi_wrt_voc.json"
+        openimages_near: "../../CVDatasets/FMIYC/OpenImages/COCO-Format/near_oi_wrt_voc.json"
+        coco_far: "../../CVDatasets/FMIYC/COCO/annotations/far_coco_wrt_voc.json"
+        coco_near: "../../CVDatasets/FMIYC/COCO/annotations/near_coco_wrt_voc.json"
+    bdd:
+        openimages_farther: "../../CVDatasets/FMIYC/OpenImages/COCO-Format/farther_oi_wrt_bdd.json"
+        coco_farther: "../../CVDatasets/FMIYC/COCO/annotations/farther_coco_wrt_bdd.json"
+
+work_dir: ${hydra:runtime.cwd}
+log_dir: logs_hydra/runs/${mlflow_experiment_name}/${now:%Y-%m-%d_%H-%M-%S}
+#latent_samples_folder: ./Extracted_latent_samples/boxes/ind_${ind_dataset}/${hooked_module}
+
+defaults:
+  - _self_
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+hydra:
+    # output paths for hydra logs
+    run:
+        dir: .
+
+    sweep:
+        dir: logs_hydra/multiruns/${now:%Y-%m-%d_%H-%M-%S}
+        subdir: ${hydra.job.num}
